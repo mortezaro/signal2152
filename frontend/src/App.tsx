@@ -4,8 +4,8 @@ import { HeroPanel } from "./components/HeroPanel";
 import { ModelRoster } from "./components/ModelRoster";
 import { NewsRail } from "./components/NewsRail";
 import { PredictionBoard } from "./components/PredictionBoard";
-import { SignalNotes } from "./components/SignalNotes";
-import { WatchlistTable } from "./components/WatchlistTable";
+import { PulseBoard } from "./components/PulseBoard";
+import { SectorPulse } from "./components/SectorPulse";
 import { getDashboard } from "./lib/api";
 import type { DashboardPayload } from "./lib/types";
 
@@ -32,7 +32,7 @@ export function App() {
     return (
       <main className="app-shell">
         <section className="loading-panel">
-          <h1>Loading market state dashboard…</h1>
+          <h1>Loading Signal2152…</h1>
         </section>
       </main>
     );
@@ -42,10 +42,12 @@ export function App() {
     <main className="app-shell">
       <HeroPanel summary={data.leaderboard} />
       <div className="dashboard-grid">
-        <ModelRoster models={data.models} />
-        <WatchlistTable watchlist={data.watchlist} />
+        <div className="dashboard-row dashboard-row-signal">
+          <SectorPulse watchlist={data.watchlist} />
+          <ModelRoster models={data.models} />
+        </div>
+        <PulseBoard watchlist={data.watchlist} />
         <PredictionBoard summary={data.leaderboard} />
-        <SignalNotes />
         <NewsRail items={data.top_news} />
       </div>
     </main>

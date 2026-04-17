@@ -9,7 +9,8 @@ from app.models.schemas import FinancialRow, NewsItem, OptionContract, PriceBar,
 
 
 def get_quote_snapshot(ticker: str) -> QuoteSnapshot:
-    info = yf.Ticker(ticker).info
+    stock = yf.Ticker(ticker)
+    info = stock.info
     return QuoteSnapshot(
         ticker=ticker.upper(),
         name=info.get("shortName") or info.get("longName"),
@@ -22,6 +23,9 @@ def get_quote_snapshot(ticker: str) -> QuoteSnapshot:
         volume=_to_float(info.get("volume")),
         avg_volume=_to_float(info.get("averageVolume")),
         currency=info.get("currency"),
+        day_low=_to_float(info.get("dayLow") or info.get("regularMarketDayLow")),
+        day_high=_to_float(info.get("dayHigh") or info.get("regularMarketDayHigh")),
+        sparkline=_get_intraday_sparkline(stock),
     )
 
 
@@ -142,3 +146,13 @@ def _to_float(value: Any) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _get_intraday_sparkline(stock: yf.Ticker) -> list[float]:
+    history = stock.history(period="1d", interval="30m", auto_adjust=False)
+    if history.empty or "Close" not in history.columns:
+        return []
+    closes = history["Close"].dropna().astype(float)
+    if closes.empty:
+        return []
+    return closes.tail(16).round(4).tolist()

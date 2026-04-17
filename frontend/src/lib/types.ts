@@ -10,6 +10,9 @@ export type QuoteSnapshot = {
   volume?: number | null;
   avg_volume?: number | null;
   currency?: string | null;
+  day_low?: number | null;
+  day_high?: number | null;
+  sparkline: number[];
 };
 
 export type PredictionRow = {

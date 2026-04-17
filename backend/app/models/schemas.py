@@ -17,6 +17,9 @@ class QuoteSnapshot(BaseModel):
     volume: float | None = None
     avg_volume: float | None = None
     currency: str | None = None
+    day_low: float | None = None
+    day_high: float | None = None
+    sparkline: list[float] = Field(default_factory=list)
 
 
 class PriceBar(BaseModel):

@@ -4,9 +4,14 @@ type Props = {
   summary?: ModelSummary | null;
 };
 
-function statusLabel(summary?: ModelSummary | null): string {
-  if (!summary) return "No model";
-  return summary.is_snapshot ? "Research Snapshot" : "Semi-live model";
+function lensLabel(summary?: ModelSummary | null): string {
+  if (!summary) return "Signal lens";
+  return summary.is_snapshot ? "Research lens" : "Signal lens";
+}
+
+function formatRefresh(value?: string | null): string {
+  if (!value) return "n/a";
+  return new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 export function HeroPanel({ summary }: Props) {
@@ -15,43 +20,38 @@ export function HeroPanel({ summary }: Props) {
   return (
     <section className="hero-panel">
       <div className="hero-copy">
-        <p className="eyebrow">Market State Dashboard</p>
-        <h1>Research-grade market data, live company context, and our alpha model in one place.</h1>
+        <p className="eyebrow">Signal2152</p>
+        <h1>Market news, cross-sectional signals, and live company context in one calm surface.</h1>
         <p className="hero-text">
-          A dashboard-first product that merges Yahoo Finance breadth with the latest exported
-          predictions from our latent market-state research stack.
+          Built for reading the market quickly: what is moving, where leadership is clustering,
+          and which names the current signal stack is leaning toward right now.
         </p>
       </div>
 
       <div className="hero-metric-card">
-        <p className="metric-label">{statusLabel(summary)}</p>
-        <h2>{summary?.display_name ?? summary?.run_label ?? "No model loaded"}</h2>
-        <div className="hero-meta-grid">
+        <div className="hero-card-header">
           <div>
-            <span>Refresh</span>
-            <strong>{summary?.refreshed_at ? new Date(summary.refreshed_at).toLocaleString() : "n/a"}</strong>
+            <p className="metric-label">{lensLabel(summary)}</p>
+            <h2>{summary?.display_name ?? summary?.run_label ?? "No model loaded"}</h2>
           </div>
-          <div>
-            <span>Signal date</span>
-            <strong>{summary?.live_date ?? "Latest research window"}</strong>
-          </div>
-          <div>
-            <span>Coverage</span>
-            <strong>{summary?.top_predictions?.length ? "Equity cross-section" : "n/a"}</strong>
-          </div>
-          <div>
-            <span>Mode</span>
-            <strong>{summary?.is_snapshot ? "Historical research" : "Semi-live refresh"}</strong>
+          <div className="hero-timestamps">
+            {summary?.live_date ? <span>{summary.live_date}</span> : null}
+            {summary?.refreshed_at ? <span>Updated {formatRefresh(summary.refreshed_at)}</span> : null}
           </div>
         </div>
 
-        <div className="highlight-strip">
-          {highlights.map((row) => (
-            <div key={`hero-${row.ticker}`} className="highlight-chip">
-              <span>{row.ticker}</span>
-              <strong>{row.prediction.toFixed(3)}</strong>
-            </div>
-          ))}
+        <div className="hero-highlight-strip">
+          {highlights.length ? (
+            highlights.map((row, index) => (
+              <div key={`hero-${row.ticker}`} className="highlight-chip">
+                <span>{index === 0 ? "Lead" : `#${index + 1}`}</span>
+                <strong>{row.ticker}</strong>
+                <em>{row.prediction.toFixed(3)}</em>
+              </div>
+            ))
+          ) : (
+            <p className="empty-copy">No active signal names yet.</p>
+          )}
         </div>
       </div>
     </section>
