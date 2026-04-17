@@ -8,7 +8,6 @@ from app.services.model_service import get_ticker_prediction, load_all_model_sum
 from app.services.yahoo_service import (
     get_company_profile,
     get_financial_summary,
-    get_upcoming_earnings,
     get_news,
     get_options_summary,
     get_price_history,
@@ -29,7 +28,6 @@ def health() -> dict[str, str]:
 def dashboard() -> DashboardPayload:
     watchlist = get_watchlist_snapshots(settings.default_watchlist)
     news = get_news("SPY", limit=6)
-    earnings = get_upcoming_earnings(settings.default_watchlist, limit=8)
     leaderboard = load_model_summary(limit=8)
     models = load_all_model_summaries(limit=5)
     return DashboardPayload(
@@ -37,7 +35,6 @@ def dashboard() -> DashboardPayload:
         leaderboard=leaderboard,
         models=models,
         top_news=news,
-        earnings_upcoming=earnings,
     )
 
 

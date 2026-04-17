@@ -48,20 +48,11 @@ export type NewsItem = {
   thumbnail_url?: string | null;
 };
 
-export type EarningsEvent = {
-  ticker: string;
-  name?: string | null;
-  earnings_date?: string | null;
-  time_hint?: string | null;
-  sector?: string | null;
-};
-
 export type DashboardPayload = {
   watchlist: QuoteSnapshot[];
   leaderboard?: ModelSummary | null;
   models: ModelSummary[];
   top_news: NewsItem[];
-  earnings_upcoming: EarningsEvent[];
 };
 
 export type PriceBar = {

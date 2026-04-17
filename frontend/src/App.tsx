@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { HeroPanel } from "./components/HeroPanel";
 import { MarketBar } from "./components/MarketBar";
-import { MarketLensPanel } from "./components/MarketLensPanel";
 import { ModelDisagreement } from "./components/ModelDisagreement";
 import { ModelConsensus } from "./components/ModelConsensus";
 import { MarketRegimeStrip } from "./components/MarketRegimeStrip";
@@ -58,10 +57,7 @@ export function App() {
           <SectorHeatmap watchlist={data.watchlist} onSelectTicker={setSelectedTicker} onSelectSector={setSelectedSector} />
           <div className="right-rail-stack">
             <ModelRoster models={data.models} />
-            <div className="dashboard-row dashboard-row-dual">
-              <RotationBoard watchlist={data.watchlist} />
-              <MarketLensPanel watchlist={data.watchlist} />
-            </div>
+            <RotationBoard watchlist={data.watchlist} />
             <div className="dashboard-row dashboard-row-dual">
               <ModelConsensus models={data.models} onSelectTicker={setSelectedTicker} />
               <ModelDisagreement models={data.models} onSelectTicker={setSelectedTicker} />

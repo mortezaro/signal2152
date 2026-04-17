@@ -31,7 +31,6 @@ body {
     radial-gradient(circle at right center, rgba(31, 138, 87, 0.08), transparent 18%),
     linear-gradient(180deg, #f8f2ea, #efe3d4 48%, #f6efe5 100%);
   color: var(--ink);
-  overflow-x: hidden;
 }
 
 a {
@@ -290,7 +289,7 @@ a {
 }
 
 .dashboard-row-signal {
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  grid-template-columns: minmax(340px, 0.85fr) minmax(0, 1.15fr);
 }
 
 .dashboard-row-dual {
@@ -325,10 +324,6 @@ a {
 
 .panel-header p {
   margin: 0 0 18px;
-}
-
-.panel-header-tight p {
-  margin-bottom: 12px;
 }
 
 .positive {
@@ -449,67 +444,6 @@ a {
   gap: 16px;
 }
 
-.compact-list {
-  display: grid;
-  gap: 10px;
-}
-
-.compact-row {
-  display: grid;
-  gap: 6px;
-  padding: 14px;
-  border-radius: 18px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.62);
-}
-
-.compact-row-stack {
-  gap: 10px;
-}
-
-.compact-row-main {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  align-items: baseline;
-}
-
-.compact-row-top {
-  align-items: center;
-}
-
-.compact-row span,
-.compact-row small {
-  color: var(--muted);
-}
-
-.compact-triplet {
-  display: inline-grid;
-  grid-auto-flow: column;
-  gap: 8px;
-}
-
-.compact-triplet em {
-  font-style: normal;
-  font-size: 0.82rem;
-  color: var(--muted);
-}
-
-.style-meter {
-  width: 100%;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(25, 22, 18, 0.08);
-  overflow: hidden;
-}
-
-.style-meter span {
-  display: block;
-  height: 100%;
-  background: linear-gradient(90deg, #d99868, #b86a37);
-  border-radius: inherit;
-}
-
 .consensus-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -585,12 +519,9 @@ a {
 }
 
 .pulse-grid-scroll {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(240px, 240px);
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding-bottom: 6px;
+  max-height: 830px;
+  overflow-y: auto;
+  padding-right: 6px;
 }
 
 .pulse-controls {
@@ -813,20 +744,6 @@ a {
 
 .news-card p {
   margin: 0;
-}
-
-@media (max-width: 1180px) {
-  .dashboard-row-signal,
-  .dashboard-row-dual,
-  .hero-panel,
-  .news-layout,
-  .market-bar {
-    grid-template-columns: 1fr;
-  }
-
-  .model-roster {
-    grid-template-columns: 1fr;
-  }
 }
 
 .loading-panel,
