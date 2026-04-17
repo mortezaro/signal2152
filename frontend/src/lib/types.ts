@@ -51,3 +51,44 @@ export type DashboardPayload = {
   models: ModelSummary[];
   top_news: NewsItem[];
 };
+
+export type PriceBar = {
+  date: string;
+  open?: number | null;
+  high?: number | null;
+  low?: number | null;
+  close?: number | null;
+  volume?: number | null;
+};
+
+export type TickerOverviewPayload = {
+  quote: QuoteSnapshot;
+  profile?: {
+    ticker?: string;
+    name?: string | null;
+    summary?: string | null;
+    website?: string | null;
+    country?: string | null;
+    city?: string | null;
+    employees?: number | null;
+    sector?: string | null;
+    industry?: string | null;
+    exchange?: string | null;
+    quote_type?: string | null;
+  };
+  prediction?: {
+    ticker: string;
+    latest?: Record<string, unknown>;
+    history?: Record<string, unknown>[];
+  } | null;
+};
+
+export type TickerHistoryPayload = {
+  ticker: string;
+  bars: PriceBar[];
+};
+
+export type TickerNewsPayload = {
+  ticker: string;
+  items: NewsItem[];
+};

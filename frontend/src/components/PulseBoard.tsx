@@ -4,6 +4,7 @@ import type { QuoteSnapshot } from "../lib/types";
 
 type Props = {
   watchlist: QuoteSnapshot[];
+  onSelectTicker: (ticker: string) => void;
 };
 
 function formatPrice(value?: number | null): string {
@@ -43,7 +44,7 @@ function Sparkline({ values }: { values: number[] }) {
   );
 }
 
-export function PulseBoard({ watchlist }: Props) {
+export function PulseBoard({ watchlist, onSelectTicker }: Props) {
   const sectorTabs = useMemo(() => {
     const sectors = Array.from(new Set(watchlist.map((item) => item.sector).filter(Boolean))) as string[];
     return ["All", ...sectors];
@@ -83,7 +84,7 @@ export function PulseBoard({ watchlist }: Props) {
               : null;
 
           return (
-            <article key={item.ticker} className="pulse-card">
+            <button key={item.ticker} type="button" className="pulse-card pulse-card-button" onClick={() => onSelectTicker(item.ticker)}>
               <div className="pulse-card-top">
                 <div>
                   <p className="eyebrow">{item.sector ?? "Market"}</p>
@@ -122,7 +123,7 @@ export function PulseBoard({ watchlist }: Props) {
                   <strong>{formatVolume(item.avg_volume)}</strong>
                 </div>
               </div>
-            </article>
+            </button>
           );
         })}
       </div>

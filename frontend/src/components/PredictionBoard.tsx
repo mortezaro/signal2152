@@ -4,6 +4,7 @@ import type { ModelSummary, PredictionRow } from "../lib/types";
 
 type Props = {
   summary?: ModelSummary | null;
+  onSelectTicker: (ticker: string) => void;
 };
 
 type TabKey = "leaders" | "laggards";
@@ -12,14 +13,14 @@ function formatPrediction(value: number): string {
   return value.toFixed(3);
 }
 
-function renderRow(row: PredictionRow, index: number, tone: "positive" | "negative") {
+function renderRow(row: PredictionRow, index: number, tone: "positive" | "negative", onSelectTicker: (ticker: string) => void) {
   const width =
     tone === "positive"
       ? Math.max(12, (row.percentile ?? 0) * 100)
       : Math.max(12, (1 - (row.percentile ?? 1)) * 100);
 
   return (
-    <div key={`${tone}-${row.ticker}`} className="signal-tile">
+    <button key={`${tone}-${row.ticker}`} type="button" className="signal-tile signal-tile-button" onClick={() => onSelectTicker(row.ticker)}>
       <div className="signal-tile-top">
         <span className="prediction-rank">#{index + 1}</span>
         <strong>{row.ticker}</strong>
@@ -31,11 +32,11 @@ function renderRow(row: PredictionRow, index: number, tone: "positive" | "negati
       <div className={`signal-bar ${tone === "negative" ? "negative-bar" : ""}`}>
         <span style={{ width: `${width}%` }} />
       </div>
-    </div>
+    </button>
   );
 }
 
-export function PredictionBoard({ summary }: Props) {
+export function PredictionBoard({ summary, onSelectTicker }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>("leaders");
   const rows = activeTab === "leaders" ? summary?.top_predictions ?? [] : summary?.bottom_predictions ?? [];
 
@@ -64,7 +65,11 @@ export function PredictionBoard({ summary }: Props) {
       </div>
 
       <div className="signal-grid">
-        {rows.length ? rows.map((row, index) => renderRow(row, index, activeTab === "leaders" ? "positive" : "negative")) : <p className="empty-copy">No signal rows yet.</p>}
+        {rows.length
+          ? rows.map((row, index) =>
+              renderRow(row, index, activeTab === "leaders" ? "positive" : "negative", onSelectTicker),
+            )
+          : <p className="empty-copy">No signal rows yet.</p>}
       </div>
     </section>
   );
