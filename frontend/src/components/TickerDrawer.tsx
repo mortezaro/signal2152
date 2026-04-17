@@ -1,12 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { getTickerHistory, getTickerNews, getTickerOverview } from "../lib/api";
-import type { NewsItem, PriceBar, TickerHistoryPayload, TickerOverviewPayload } from "../lib/types";
+import { getTickerFinancials, getTickerHistory, getTickerNews, getTickerOverview } from "../lib/api";
+import type {
+  FinancialRow,
+  NewsItem,
+  PriceBar,
+  TickerFinancialsPayload,
+  TickerHistoryPayload,
+  TickerOverviewPayload,
+} from "../lib/types";
 
 type Props = {
   ticker: string | null;
   onClose: () => void;
 };
+
+type DrawerTab = "overview" | "prediction" | "fundamentals";
 
 function Sparkline({ bars }: { bars: PriceBar[] }) {
   const closes = bars.map((bar) => bar.close).filter((value): value is number => typeof value === "number");
@@ -30,6 +39,63 @@ function Sparkline({ bars }: { bars: PriceBar[] }) {
   );
 }
 
+function PredictionHistory({ overview }: { overview?: TickerOverviewPayload | null }) {
+  const history = overview?.prediction?.history ?? [];
+  const values = history
+    .map((row) => row.prediction)
+    .filter((value): value is number => typeof value === "number")
+    .slice(-24);
+
+  if (!values.length) return <p className="empty-copy">No prediction history available.</p>;
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+
+  return (
+    <div className="prediction-history">
+      {values.map((value, index) => {
+        const height = 28 + ((value - min) / span) * 72;
+        return <span key={`${value}-${index}`} style={{ height: `${height}px` }} />;
+      })}
+    </div>
+  );
+}
+
+function formatMetricValue(value: number | null | undefined): string {
+  if (typeof value !== "number") return "—";
+  if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
+  if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (Math.abs(value) >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return value.toFixed(1);
+}
+
+function FundamentalsBlock({ financials }: { financials?: TickerFinancialsPayload | null }) {
+  const sections = Object.entries(financials?.financials ?? {}).filter(([, rows]) => rows.length);
+  if (!sections.length) return <p className="empty-copy">No fundamentals returned for this ticker.</p>;
+
+  return (
+    <div className="fundamentals-sections">
+      {sections.slice(0, 2).map(([section, rows]) => (
+        <div key={section} className="fundamentals-card">
+          <h4>{section.replaceAll("_", " ")}</h4>
+          <div className="fundamentals-list">
+            {(rows as FinancialRow[]).slice(0, 4).map((row) => {
+              const latest = Object.values(row.values)[0];
+              return (
+                <div key={row.label} className="fundamentals-row">
+                  <span>{row.label}</span>
+                  <strong>{formatMetricValue(latest)}</strong>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function latestPredictionValue(overview?: TickerOverviewPayload | null): string {
   const latest = overview?.prediction?.latest;
   if (!latest) return "—";
@@ -41,16 +107,23 @@ export function TickerDrawer({ ticker, onClose }: Props) {
   const [overview, setOverview] = useState<TickerOverviewPayload | null>(null);
   const [history, setHistory] = useState<TickerHistoryPayload | null>(null);
   const [news, setNews] = useState<NewsItem[]>([]);
+  const [financials, setFinancials] = useState<TickerFinancialsPayload | null>(null);
+  const [activeTab, setActiveTab] = useState<DrawerTab>("overview");
 
   useEffect(() => {
     if (!ticker) return;
-    Promise.all([getTickerOverview(ticker), getTickerHistory(ticker, "1mo", "1d"), getTickerNews(ticker, 5)]).then(
-      ([overviewData, historyData, newsData]) => {
-        setOverview(overviewData);
-        setHistory(historyData);
-        setNews(newsData.items);
-      },
-    );
+    setActiveTab("overview");
+    Promise.all([
+      getTickerOverview(ticker),
+      getTickerHistory(ticker, "3mo", "1d"),
+      getTickerNews(ticker, 5),
+      getTickerFinancials(ticker),
+    ]).then(([overviewData, historyData, newsData, financialsData]) => {
+      setOverview(overviewData);
+      setHistory(historyData);
+      setNews(newsData.items);
+      setFinancials(financialsData);
+    });
   }, [ticker]);
 
   const headerName = overview?.quote?.name ?? ticker;
@@ -91,22 +164,65 @@ export function TickerDrawer({ ticker, onClose }: Props) {
           </div>
         </div>
 
-        <div className="drawer-chart-wrap">
-          <Sparkline bars={history?.bars ?? []} />
+        <div className="tab-strip">
+          <button
+            type="button"
+            className={activeTab === "overview" ? "tab-pill active" : "tab-pill"}
+            onClick={() => setActiveTab("overview")}
+          >
+            Overview
+          </button>
+          <button
+            type="button"
+            className={activeTab === "prediction" ? "tab-pill active" : "tab-pill"}
+            onClick={() => setActiveTab("prediction")}
+          >
+            Prediction path
+          </button>
+          <button
+            type="button"
+            className={activeTab === "fundamentals" ? "tab-pill active" : "tab-pill"}
+            onClick={() => setActiveTab("fundamentals")}
+          >
+            Fundamentals
+          </button>
         </div>
 
-        {summary ? <p className="drawer-summary">{summary}…</p> : null}
+        {activeTab === "overview" ? (
+          <>
+            <div className="drawer-chart-wrap">
+              <Sparkline bars={history?.bars ?? []} />
+            </div>
+            {summary ? <p className="drawer-summary">{summary}…</p> : null}
+            <div className="drawer-news">
+              <h3>Latest on {ticker}</h3>
+              <div className="drawer-news-list">
+                {news.map((item, index) => (
+                  <a key={`${item.title}-${index}`} href={item.link ?? "#"} target="_blank" rel="noreferrer">
+                    {item.title}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : null}
 
-        <div className="drawer-news">
-          <h3>Latest on {ticker}</h3>
-          <div className="drawer-news-list">
-            {news.map((item, index) => (
-              <a key={`${item.title}-${index}`} href={item.link ?? "#"} target="_blank" rel="noreferrer">
-                {item.title}
-              </a>
-            ))}
-          </div>
-        </div>
+        {activeTab === "prediction" ? (
+          <section className="drawer-section">
+            <h3>Prediction history</h3>
+            <PredictionHistory overview={overview} />
+            <p className="drawer-summary">
+              Recent model path for this ticker from the active signal source. This is useful for seeing whether conviction is strengthening or fading.
+            </p>
+          </section>
+        ) : null}
+
+        {activeTab === "fundamentals" ? (
+          <section className="drawer-section">
+            <h3>Fundamentals snapshot</h3>
+            <FundamentalsBlock financials={financials} />
+          </section>
+        ) : null}
       </aside>
     </div>
   );

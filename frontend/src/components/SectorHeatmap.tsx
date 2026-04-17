@@ -8,7 +8,8 @@ type Props = {
 type SectorBucket = {
   name: string;
   avgChange: number;
-  names: QuoteSnapshot[];
+  leader: QuoteSnapshot | null;
+  laggard: QuoteSnapshot | null;
 };
 
 function buildBuckets(watchlist: QuoteSnapshot[]): SectorBucket[] {
@@ -25,9 +26,20 @@ function buildBuckets(watchlist: QuoteSnapshot[]): SectorBucket[] {
     .map(([name, names]) => {
       const changes = names.map((item) => item.change_percent).filter((value): value is number => typeof value === "number");
       const avgChange = changes.length ? changes.reduce((sum, value) => sum + value, 0) / changes.length : 0;
-      return { name, avgChange, names };
+      const sorted = [...names].sort((a, b) => (b.change_percent ?? -999) - (a.change_percent ?? -999));
+      return {
+        name,
+        avgChange,
+        leader: sorted[0] ?? null,
+        laggard: sorted[sorted.length - 1] ?? null,
+      };
     })
     .sort((a, b) => b.avgChange - a.avgChange);
+}
+
+function moveLabel(item: QuoteSnapshot | null): string {
+  if (!item || typeof item.change_percent !== "number") return "—";
+  return `${item.change_percent >= 0 ? "+" : ""}${item.change_percent.toFixed(2)}%`;
 }
 
 export function SectorHeatmap({ watchlist, onSelectTicker }: Props) {
@@ -37,7 +49,7 @@ export function SectorHeatmap({ watchlist, onSelectTicker }: Props) {
     <section className="panel">
       <div className="panel-header">
         <h2>Sector heatmap</h2>
-        <p>Cross-sectional tone by sector, with quick access to the names driving each pocket.</p>
+        <p>Each tile shows sector tone plus the internal leader and laggard, so relative movement is easier to read.</p>
       </div>
 
       <div className="sector-heatmap">
@@ -53,17 +65,29 @@ export function SectorHeatmap({ watchlist, onSelectTicker }: Props) {
                 {sector.avgChange.toFixed(2)}%
               </span>
             </div>
-            <div className="sector-heat-tickers">
-              {sector.names.map((item) => (
-                <button key={item.ticker} type="button" className="heat-ticker" onClick={() => onSelectTicker(item.ticker)}>
-                  <strong>{item.ticker}</strong>
-                  <span>
-                    {typeof item.change_percent === "number"
-                      ? `${item.change_percent >= 0 ? "+" : ""}${item.change_percent.toFixed(2)}%`
-                      : "—"}
-                  </span>
-                </button>
-              ))}
+
+            <div className="sector-heat-duo">
+              <button
+                type="button"
+                className="heat-ticker heat-ticker-leader"
+                onClick={() => sector.leader && onSelectTicker(sector.leader.ticker)}
+                disabled={!sector.leader}
+              >
+                <span>Leader</span>
+                <strong>{sector.leader?.ticker ?? "—"}</strong>
+                <em>{moveLabel(sector.leader)}</em>
+              </button>
+
+              <button
+                type="button"
+                className="heat-ticker heat-ticker-laggard"
+                onClick={() => sector.laggard && onSelectTicker(sector.laggard.ticker)}
+                disabled={!sector.laggard}
+              >
+                <span>Laggard</span>
+                <strong>{sector.laggard?.ticker ?? "—"}</strong>
+                <em>{moveLabel(sector.laggard)}</em>
+              </button>
             </div>
           </div>
         ))}

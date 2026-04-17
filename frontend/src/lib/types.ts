@@ -92,3 +92,13 @@ export type TickerNewsPayload = {
   ticker: string;
   items: NewsItem[];
 };
+
+export type FinancialRow = {
+  label: string;
+  values: Record<string, number | null>;
+};
+
+export type TickerFinancialsPayload = {
+  ticker: string;
+  financials: Record<string, FinancialRow[]>;
+};

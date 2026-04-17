@@ -56,7 +56,7 @@ a {
 
 .regime-strip {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 14px;
 }
@@ -69,6 +69,12 @@ a {
   border: 1px solid var(--line);
   background: rgba(255, 251, 246, 0.78);
   box-shadow: var(--shadow);
+}
+
+.regime-chip-primary {
+  background:
+    linear-gradient(180deg, rgba(184, 106, 55, 0.18), rgba(255, 255, 255, 0.74)),
+    rgba(255, 251, 246, 0.78);
 }
 
 .regime-chip span {
@@ -374,11 +380,14 @@ a {
   gap: 8px;
 }
 
+.sector-heat-duo {
+  display: grid;
+  gap: 10px;
+}
+
 .heat-ticker {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: center;
+  display: grid;
+  gap: 4px;
   padding: 10px 12px;
   border-radius: 14px;
   border: 1px solid rgba(25, 22, 18, 0.08);
@@ -386,6 +395,21 @@ a {
   font: inherit;
   text-align: left;
   cursor: pointer;
+}
+
+.heat-ticker span,
+.heat-ticker em {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-style: normal;
+}
+
+.heat-ticker-leader {
+  background: rgba(93, 179, 136, 0.1);
+}
+
+.heat-ticker-laggard {
+  background: rgba(179, 131, 131, 0.1);
 }
 
 .model-roster {
@@ -758,6 +782,10 @@ a {
   margin: 0 0 12px;
 }
 
+.drawer-section h3 {
+  margin: 0 0 12px;
+}
+
 .drawer-news-list {
   display: grid;
   gap: 10px;
@@ -769,6 +797,62 @@ a {
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(25, 22, 18, 0.08);
   line-height: 1.35;
+}
+
+.prediction-history {
+  display: flex;
+  align-items: end;
+  gap: 6px;
+  min-height: 120px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(25, 22, 18, 0.08);
+}
+
+.prediction-history span {
+  flex: 1;
+  border-radius: 999px 999px 4px 4px;
+  background: linear-gradient(180deg, rgba(184, 106, 55, 0.92), rgba(184, 106, 55, 0.28));
+}
+
+.fundamentals-sections {
+  display: grid;
+  gap: 14px;
+}
+
+.fundamentals-card {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(25, 22, 18, 0.08);
+}
+
+.fundamentals-card h4 {
+  margin: 0 0 12px;
+  text-transform: capitalize;
+}
+
+.fundamentals-list {
+  display: grid;
+  gap: 10px;
+}
+
+.fundamentals-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(25, 22, 18, 0.08);
+}
+
+.fundamentals-row:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.fundamentals-row span {
+  color: var(--muted);
 }
 
 @media (max-width: 1080px) {
