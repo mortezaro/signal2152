@@ -3,6 +3,7 @@ import type { QuoteSnapshot } from "../lib/types";
 type Props = {
   watchlist: QuoteSnapshot[];
   onSelectTicker: (ticker: string) => void;
+  onSelectSector: (sector: string) => void;
 };
 
 type SectorBucket = {
@@ -42,7 +43,7 @@ function moveLabel(item: QuoteSnapshot | null): string {
   return `${item.change_percent >= 0 ? "+" : ""}${item.change_percent.toFixed(2)}%`;
 }
 
-export function SectorHeatmap({ watchlist, onSelectTicker }: Props) {
+export function SectorHeatmap({ watchlist, onSelectTicker, onSelectSector }: Props) {
   const sectors = buildBuckets(watchlist);
 
   return (
@@ -57,6 +58,15 @@ export function SectorHeatmap({ watchlist, onSelectTicker }: Props) {
           <div
             key={sector.name}
             className={sector.avgChange >= 0 ? "sector-heat-card sector-positive" : "sector-heat-card sector-negative"}
+            onClick={() => onSelectSector(sector.name)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onSelectSector(sector.name);
+              }
+            }}
+            role="button"
+            tabIndex={0}
           >
             <div className="sector-heat-top">
               <strong>{sector.name}</strong>
@@ -70,7 +80,10 @@ export function SectorHeatmap({ watchlist, onSelectTicker }: Props) {
               <button
                 type="button"
                 className="heat-ticker heat-ticker-leader"
-                onClick={() => sector.leader && onSelectTicker(sector.leader.ticker)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  sector.leader && onSelectTicker(sector.leader.ticker);
+                }}
                 disabled={!sector.leader}
               >
                 <span>Leader</span>
@@ -81,7 +94,10 @@ export function SectorHeatmap({ watchlist, onSelectTicker }: Props) {
               <button
                 type="button"
                 className="heat-ticker heat-ticker-laggard"
-                onClick={() => sector.laggard && onSelectTicker(sector.laggard.ticker)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  sector.laggard && onSelectTicker(sector.laggard.ticker);
+                }}
                 disabled={!sector.laggard}
               >
                 <span>Laggard</span>

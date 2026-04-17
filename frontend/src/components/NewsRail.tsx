@@ -24,6 +24,11 @@ export function NewsRail({ items }: Props) {
       <div className="news-layout">
         {lead ? (
           <a className="news-card news-card-lead" href={lead.link ?? "#"} target="_blank" rel="noreferrer">
+            {lead.thumbnail_url ? (
+              <div className="news-lead-media">
+                <img src={lead.thumbnail_url} alt="" />
+              </div>
+            ) : null}
             <p className="news-source">
               {lead.publisher ?? "Unknown source"} · {formatPublished(lead.published_at)}
             </p>

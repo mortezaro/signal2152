@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 
 import { HeroPanel } from "./components/HeroPanel";
 import { MarketBar } from "./components/MarketBar";
+import { ModelDisagreement } from "./components/ModelDisagreement";
 import { ModelConsensus } from "./components/ModelConsensus";
 import { MarketRegimeStrip } from "./components/MarketRegimeStrip";
 import { ModelRoster } from "./components/ModelRoster";
 import { NewsRail } from "./components/NewsRail";
 import { PredictionBoard } from "./components/PredictionBoard";
 import { PulseBoard } from "./components/PulseBoard";
+import { SectorDrawer } from "./components/SectorDrawer";
 import { SectorHeatmap } from "./components/SectorHeatmap";
 import { TickerDrawer } from "./components/TickerDrawer";
 import { getDashboard } from "./lib/api";
@@ -17,6 +19,7 @@ export function App() {
   const [data, setData] = useState<DashboardPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
+  const [selectedSector, setSelectedSector] = useState<string | null>(null);
 
   useEffect(() => {
     getDashboard().then(setData).catch((err: Error) => setError(err.message));
@@ -50,15 +53,27 @@ export function App() {
       <HeroPanel summary={data.leaderboard} />
       <div className="dashboard-grid">
         <div className="dashboard-row dashboard-row-signal">
-          <SectorHeatmap watchlist={data.watchlist} onSelectTicker={setSelectedTicker} />
+          <SectorHeatmap watchlist={data.watchlist} onSelectTicker={setSelectedTicker} onSelectSector={setSelectedSector} />
           <ModelRoster models={data.models} />
         </div>
-        <ModelConsensus models={data.models} onSelectTicker={setSelectedTicker} />
+        <div className="dashboard-row dashboard-row-dual">
+          <ModelConsensus models={data.models} onSelectTicker={setSelectedTicker} />
+          <ModelDisagreement models={data.models} onSelectTicker={setSelectedTicker} />
+        </div>
         <PulseBoard watchlist={data.watchlist} onSelectTicker={setSelectedTicker} />
         <PredictionBoard summary={data.leaderboard} onSelectTicker={setSelectedTicker} />
         <NewsRail items={data.top_news} />
       </div>
       <TickerDrawer ticker={selectedTicker} onClose={() => setSelectedTicker(null)} />
+      <SectorDrawer
+        sector={selectedSector}
+        watchlist={data.watchlist}
+        onClose={() => setSelectedSector(null)}
+        onSelectTicker={(ticker) => {
+          setSelectedSector(null);
+          setSelectedTicker(ticker);
+        }}
+      />
     </main>
   );
 }

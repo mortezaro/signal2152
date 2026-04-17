@@ -45,6 +45,7 @@ export type NewsItem = {
   link?: string | null;
   published_at?: string | null;
   summary?: string | null;
+  thumbnail_url?: string | null;
 };
 
 export type DashboardPayload = {

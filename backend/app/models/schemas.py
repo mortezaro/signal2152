@@ -39,6 +39,7 @@ class NewsItem(BaseModel):
     link: str | None = None
     published_at: str | None = None
     summary: str | None = None
+    thumbnail_url: str | None = None
 
 
 class OptionContract(BaseModel):

@@ -83,6 +83,7 @@ def get_news(ticker: str, limit: int = 8) -> list[NewsItem]:
                 link=content.get("canonicalUrl", {}).get("url") or item.get("link"),
                 published_at=content.get("pubDate") or item.get("providerPublishTime"),
                 summary=content.get("summary"),
+                thumbnail_url=_extract_thumbnail_url(content),
             )
         )
     return items
@@ -168,3 +169,13 @@ def _get_sparkline(stock: yf.Ticker, period: str, interval: str, limit: int = 24
     if closes.empty:
         return []
     return closes.tail(limit).round(4).tolist()
+
+
+def _extract_thumbnail_url(content: dict[str, Any]) -> str | None:
+    thumbnail = content.get("thumbnail") or {}
+    resolutions = thumbnail.get("resolutions") or []
+    for item in resolutions:
+        url = item.get("url")
+        if url:
+            return str(url)
+    return None
