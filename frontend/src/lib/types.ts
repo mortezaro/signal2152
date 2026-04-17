@@ -24,6 +24,7 @@ export type PredictionRow = {
 export type ModelSummary = {
   model_name?: string | null;
   run_label?: string | null;
+  artifact_dir?: string | null;
   metrics?: Record<string, unknown>;
   top_predictions: PredictionRow[];
   bottom_predictions: PredictionRow[];
