@@ -25,6 +25,7 @@ function buildConsensus(models: ModelSummary[]): ConsensusRow[] {
 
   return [...scores.entries()]
     .map(([ticker, value]) => ({ ticker, mentions: value.mentions, score: value.score / value.mentions }))
+    .filter((row) => row.mentions >= 2)
     .sort((a, b) => b.mentions - a.mentions || b.score - a.score)
     .slice(0, 6);
 }

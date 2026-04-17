@@ -35,6 +35,7 @@ function buildBuckets(watchlist: QuoteSnapshot[]): SectorBucket[] {
         laggard: sorted[sorted.length - 1] ?? null,
       };
     })
+    .filter((sector) => sector.leader && sector.laggard && sector.leader.ticker !== sector.laggard.ticker)
     .sort((a, b) => b.avgChange - a.avgChange);
 }
 

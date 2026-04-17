@@ -13,7 +13,34 @@ class Settings(BaseSettings):
     lmsa_metrics_json: Path | None = None
     lmsa_model_summary_json: Path | None = None
     lmsa_results_root: Path | None = Path("/Users/morteza/Documents/Playground/market-state-dashboard/backend/runtime_artifacts/models")
-    default_watchlist: list[str] = ["AAPL", "MSFT", "NVDA", "AMZN", "META", "SPY"]
+    default_watchlist: list[str] = [
+        "AAPL",
+        "MSFT",
+        "NVDA",
+        "AVGO",
+        "AMZN",
+        "HD",
+        "NKE",
+        "MCD",
+        "META",
+        "GOOGL",
+        "NFLX",
+        "TMUS",
+        "JPM",
+        "GS",
+        "SCHW",
+        "XOM",
+        "CVX",
+        "COP",
+        "LLY",
+        "UNH",
+        "ISRG",
+        "CAT",
+        "HON",
+        "GE",
+        "SPY",
+        "QQQ",
+    ]
 
     model_config = SettingsConfigDict(
         env_prefix="",
