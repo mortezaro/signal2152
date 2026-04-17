@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { HeroPanel } from "./components/HeroPanel";
+import { MarketBar } from "./components/MarketBar";
 import { ModelRoster } from "./components/ModelRoster";
 import { NewsRail } from "./components/NewsRail";
 import { PredictionBoard } from "./components/PredictionBoard";
@@ -40,6 +41,7 @@ export function App() {
 
   return (
     <main className="app-shell">
+      <MarketBar watchlist={data.watchlist} items={data.top_news} />
       <HeroPanel summary={data.leaderboard} />
       <div className="dashboard-grid">
         <div className="dashboard-row dashboard-row-signal">

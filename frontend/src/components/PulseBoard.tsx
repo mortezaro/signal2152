@@ -1,3 +1,5 @@
+import { useMemo, useState } from "react";
+
 import type { QuoteSnapshot } from "../lib/types";
 
 type Props = {
@@ -42,15 +44,36 @@ function Sparkline({ values }: { values: number[] }) {
 }
 
 export function PulseBoard({ watchlist }: Props) {
+  const sectorTabs = useMemo(() => {
+    const sectors = Array.from(new Set(watchlist.map((item) => item.sector).filter(Boolean))) as string[];
+    return ["All", ...sectors];
+  }, [watchlist]);
+  const [activeTab, setActiveTab] = useState("All");
+
+  const visible = watchlist.filter((item) => activeTab === "All" || item.sector === activeTab);
+
   return (
     <section className="panel">
       <div className="panel-header">
         <h2>Pulse board</h2>
-        <p>Core names with intraday movement, range context, and a quick read on where the session feels active.</p>
+        <p>Compact market cards with intraday range and day shape, filtered by sector when you want a tighter read.</p>
+      </div>
+
+      <div className="tab-strip">
+        {sectorTabs.map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            className={tab === activeTab ? "tab-pill active" : "tab-pill"}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
       <div className="pulse-grid">
-        {watchlist.map((item) => {
+        {visible.map((item) => {
           const rangeProgress =
             typeof item.price === "number" &&
             typeof item.day_low === "number" &&

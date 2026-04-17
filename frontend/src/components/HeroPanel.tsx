@@ -21,10 +21,9 @@ export function HeroPanel({ summary }: Props) {
     <section className="hero-panel">
       <div className="hero-copy">
         <p className="eyebrow">Signal2152</p>
-        <h1>Market news, cross-sectional signals, and live company context in one calm surface.</h1>
+        <h1>Today&apos;s market map</h1>
         <p className="hero-text">
-          Built for reading the market quickly: what is moving, where leadership is clustering,
-          and which names the current signal stack is leaning toward right now.
+          Fast read on leadership, laggards, sector tone, and the live names sitting at the top of the board.
         </p>
       </div>
 

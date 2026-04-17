@@ -54,6 +54,61 @@ a {
   padding: 32px 20px 64px;
 }
 
+.market-bar {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.75fr) minmax(0, 1.25fr);
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.market-bar-block {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255, 251, 246, 0.76);
+  box-shadow: var(--shadow);
+}
+
+.market-bar-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.market-bar-ticker-list,
+.market-bar-headlines {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.market-chip {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  white-space: nowrap;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(25, 22, 18, 0.08);
+}
+
+.market-bar-headlines a {
+  min-width: 240px;
+  max-width: 320px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(25, 22, 18, 0.08);
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
 .hero-panel,
 .panel,
 .loading-panel,
@@ -69,22 +124,23 @@ a {
   grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
   gap: 28px;
   border-radius: 34px;
-  padding: 30px;
+  padding: 22px 24px;
   margin-bottom: 28px;
 }
 
 .hero-copy h1 {
-  margin: 10px 0 14px;
-  font-size: clamp(2.55rem, 5vw, 5rem);
-  line-height: 0.93;
+  margin: 8px 0 10px;
+  font-size: clamp(1.95rem, 4vw, 3.35rem);
+  line-height: 0.96;
   letter-spacing: -0.055em;
-  max-width: 12ch;
+  max-width: 10ch;
 }
 
 .hero-text,
 .panel-header p,
 .news-card p,
 .prediction-row span,
+.signal-tile span,
 .pulse-name,
 .model-card-footer span {
   color: var(--muted);
@@ -104,7 +160,7 @@ a {
   border-radius: 28px;
   background: linear-gradient(160deg, rgba(184, 106, 55, 0.16), rgba(255, 255, 255, 0.36));
   border: 1px solid rgba(184, 106, 55, 0.18);
-  padding: 24px;
+  padding: 18px;
 }
 
 .hero-card-header {
@@ -116,8 +172,8 @@ a {
 }
 
 .hero-card-header h2 {
-  margin: 8px 0 0;
-  font-size: 1.85rem;
+  margin: 6px 0 0;
+  font-size: 1.35rem;
   line-height: 1.05;
 }
 
@@ -131,15 +187,15 @@ a {
 
 .hero-highlight-strip {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .highlight-chip {
   display: grid;
   gap: 4px;
-  padding: 14px 16px;
-  border-radius: 18px;
+  padding: 12px 14px;
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.62);
   border: 1px solid rgba(25, 22, 18, 0.08);
 }
@@ -156,6 +212,36 @@ a {
 .dashboard-grid {
   display: grid;
   gap: 24px;
+}
+
+.tab-strip {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: -4px 0 18px;
+}
+
+.tab-pill {
+  border: 1px solid rgba(25, 22, 18, 0.1);
+  background: rgba(255, 255, 255, 0.56);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 9px 14px;
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: 150ms ease;
+}
+
+.tab-pill:hover {
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+}
+
+.tab-pill.active {
+  background: linear-gradient(90deg, rgba(184, 106, 55, 0.22), rgba(255, 255, 255, 0.82));
+  color: var(--ink);
+  border-color: rgba(184, 106, 55, 0.18);
 }
 
 .dashboard-row {
@@ -414,6 +500,39 @@ a {
   padding: 14px 16px;
 }
 
+.signal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.signal-tile {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(233, 220, 200, 0.54)),
+    linear-gradient(135deg, rgba(184, 106, 55, 0.08), transparent 60%);
+}
+
+.signal-tile-top,
+.signal-tile-score {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.signal-tile-top strong {
+  font-size: 1.22rem;
+}
+
+.signal-tile-score strong {
+  font-size: 1rem;
+}
+
 .prediction-primary,
 .prediction-secondary {
   display: grid;
@@ -475,6 +594,7 @@ a {
 }
 
 @media (max-width: 1080px) {
+  .market-bar,
   .hero-panel,
   .dashboard-row-signal,
   .news-layout,
@@ -507,6 +627,7 @@ a {
   .hero-highlight-strip,
   .model-roster,
   .pulse-grid,
+  .signal-grid,
   .news-list {
     grid-template-columns: 1fr;
   }
