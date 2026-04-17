@@ -84,6 +84,10 @@ a {
   color: var(--muted);
 }
 
+.regime-chip strong {
+  white-space: nowrap;
+}
+
 .market-bar {
   display: grid;
   grid-template-columns: minmax(260px, 0.75fr) minmax(0, 1.25fr);

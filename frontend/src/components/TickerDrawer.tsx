@@ -109,7 +109,7 @@ function FundamentalsBlock({ financials }: { financials?: TickerFinancialsPayloa
     <div className="fundamentals-sections">
       {sections.slice(0, 2).map(([section, rows]) => (
         <div key={section} className="fundamentals-card">
-          <h4>{section.replaceAll("_", " ")}</h4>
+          <h4>{section.split("_").join(" ")}</h4>
           <div className="fundamentals-list">
             {(rows as FinancialRow[]).slice(0, 4).map((row) => {
               const latest = Object.values(row.values)[0];
