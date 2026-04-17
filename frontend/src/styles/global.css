@@ -1,0 +1,251 @@
+:root {
+  --paper: #f7f0e6;
+  --paper-deep: #ecdfcf;
+  --ink: #1f1b18;
+  --muted: #6f665e;
+  --accent: #b35c2e;
+  --accent-soft: rgba(179, 92, 46, 0.14);
+  --line: rgba(31, 27, 24, 0.12);
+  --card: rgba(255, 252, 248, 0.82);
+  --positive: #1f8a57;
+  --negative: #b13838;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: Georgia, "Times New Roman", serif;
+  background:
+    radial-gradient(circle at top left, rgba(179, 92, 46, 0.15), transparent 25%),
+    linear-gradient(180deg, #f9f3ea, #efe4d4 50%, #f7f0e6 100%);
+  color: var(--ink);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-shell {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 32px 20px 56px;
+}
+
+.hero-panel,
+.panel,
+.loading-panel,
+.error-panel {
+  border: 1px solid var(--line);
+  background: var(--card);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 18px 42px rgba(59, 40, 26, 0.08);
+}
+
+.hero-panel {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 28px;
+  border-radius: 32px;
+  padding: 28px;
+  margin-bottom: 28px;
+}
+
+.hero-copy h1 {
+  margin: 8px 0 12px;
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+.eyebrow,
+.metric-label,
+.news-source {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.hero-text,
+.panel-header p,
+.news-card p,
+.prediction-row span {
+  color: var(--muted);
+}
+
+.hero-metric-card {
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(179, 92, 46, 0.14), rgba(255, 255, 255, 0.28));
+  border: 1px solid rgba(179, 92, 46, 0.2);
+  padding: 22px;
+}
+
+.hero-metric-card h2 {
+  margin: 10px 0 18px;
+  font-size: 1.8rem;
+}
+
+.artifact-copy {
+  margin: -8px 0 18px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.metric-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.metric-grid strong {
+  font-size: 1.2rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.panel {
+  border-radius: 28px;
+  padding: 24px;
+}
+
+.split-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.panel-header h2 {
+  margin: 0 0 6px;
+  font-size: 1.7rem;
+}
+
+.panel-header p {
+  margin: 0 0 18px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.watchlist-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.watchlist-table th,
+.watchlist-table td {
+  padding: 14px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.watchlist-table th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.positive {
+  color: var(--positive);
+}
+
+.negative {
+  color: var(--negative);
+}
+
+.prediction-list {
+  display: grid;
+  gap: 12px;
+}
+
+.prediction-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid var(--line);
+}
+
+.prediction-row strong {
+  display: block;
+}
+
+.news-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.notes-grid div {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.news-card {
+  display: block;
+  min-height: 220px;
+  border-radius: 22px;
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(236, 223, 207, 0.92)),
+    var(--paper-deep);
+  border: 1px solid var(--line);
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.news-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(59, 40, 26, 0.12);
+}
+
+.news-card h3 {
+  margin: 10px 0;
+  line-height: 1.15;
+}
+
+.loading-panel,
+.error-panel {
+  border-radius: 28px;
+  padding: 48px;
+  text-align: center;
+}
+
+@media (max-width: 960px) {
+  .hero-panel,
+  .split-panel,
+  .notes-grid {
+    grid-template-columns: 1fr;
+  }
+}
