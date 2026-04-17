@@ -26,6 +26,8 @@ def get_quote_snapshot(ticker: str) -> QuoteSnapshot:
         day_low=_to_float(info.get("dayLow") or info.get("regularMarketDayLow")),
         day_high=_to_float(info.get("dayHigh") or info.get("regularMarketDayHigh")),
         sparkline=_get_intraday_sparkline(stock),
+        sparkline_5d=_get_sparkline(stock, period="5d", interval="30m", limit=24),
+        sparkline_1mo=_get_sparkline(stock, period="1mo", interval="1d", limit=24),
     )
 
 
@@ -156,3 +158,13 @@ def _get_intraday_sparkline(stock: yf.Ticker) -> list[float]:
     if closes.empty:
         return []
     return closes.tail(16).round(4).tolist()
+
+
+def _get_sparkline(stock: yf.Ticker, period: str, interval: str, limit: int = 24) -> list[float]:
+    history = stock.history(period=period, interval=interval, auto_adjust=False)
+    if history.empty or "Close" not in history.columns:
+        return []
+    closes = history["Close"].dropna().astype(float)
+    if closes.empty:
+        return []
+    return closes.tail(limit).round(4).tolist()

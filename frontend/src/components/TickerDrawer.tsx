@@ -16,26 +16,65 @@ type Props = {
 };
 
 type DrawerTab = "overview" | "prediction" | "fundamentals";
+type DrawerTimeframe = "1M" | "3M" | "6M";
 
-function Sparkline({ bars }: { bars: PriceBar[] }) {
-  const closes = bars.map((bar) => bar.close).filter((value): value is number => typeof value === "number");
+function formatMetricValue(value: number | null | undefined): string {
+  if (typeof value !== "number") return "—";
+  if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
+  if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (Math.abs(value) >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return value.toFixed(1);
+}
+
+function InteractiveChart({ bars }: { bars: PriceBar[] }) {
+  const closes = bars
+    .map((bar) => ({ date: bar.date, close: bar.close }))
+    .filter((bar): bar is { date: string; close: number } => typeof bar.close === "number");
+  const [activeIndex, setActiveIndex] = useState<number | null>(closes.length ? closes.length - 1 : null);
+
+  useEffect(() => {
+    setActiveIndex(closes.length ? closes.length - 1 : null);
+  }, [bars.length]);
+
   if (!closes.length) return <div className="drawer-chart-empty" />;
 
-  const min = Math.min(...closes);
-  const max = Math.max(...closes);
+  const min = Math.min(...closes.map((bar) => bar.close));
+  const max = Math.max(...closes.map((bar) => bar.close));
   const span = max - min || 1;
   const points = closes
-    .map((value, index) => {
+    .map((bar, index) => {
       const x = (index / Math.max(closes.length - 1, 1)) * 100;
-      const y = 100 - ((value - min) / span) * 100;
+      const y = 100 - ((bar.close - min) / span) * 100;
       return `${x},${y}`;
     })
     .join(" ");
 
+  const active = activeIndex != null ? closes[activeIndex] : null;
+
   return (
-    <svg className="drawer-chart" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-      <polyline points={points} />
-    </svg>
+    <div className="interactive-chart-wrap">
+      <div className="interactive-chart-meta">
+        <strong>{active ? active.close.toFixed(2) : "—"}</strong>
+        <span>{active?.date ?? ""}</span>
+      </div>
+      <div className="interactive-chart-hitbox">
+        <svg className="drawer-chart" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <polyline points={points} />
+        </svg>
+        <div className="interactive-chart-sensors">
+          {closes.map((bar, index) => (
+            <button
+              key={`${bar.date}-${index}`}
+              type="button"
+              aria-label={bar.date}
+              className="interactive-chart-sensor"
+              onMouseEnter={() => setActiveIndex(index)}
+              onFocus={() => setActiveIndex(index)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -60,14 +99,6 @@ function PredictionHistory({ overview }: { overview?: TickerOverviewPayload | nu
       })}
     </div>
   );
-}
-
-function formatMetricValue(value: number | null | undefined): string {
-  if (typeof value !== "number") return "—";
-  if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
-  if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
-  if (Math.abs(value) >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
-  return value.toFixed(1);
 }
 
 function FundamentalsBlock({ financials }: { financials?: TickerFinancialsPayload | null }) {
@@ -109,22 +140,25 @@ export function TickerDrawer({ ticker, onClose }: Props) {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [financials, setFinancials] = useState<TickerFinancialsPayload | null>(null);
   const [activeTab, setActiveTab] = useState<DrawerTab>("overview");
+  const [timeframe, setTimeframe] = useState<DrawerTimeframe>("3M");
 
   useEffect(() => {
     if (!ticker) return;
     setActiveTab("overview");
-    Promise.all([
-      getTickerOverview(ticker),
-      getTickerHistory(ticker, "3mo", "1d"),
-      getTickerNews(ticker, 5),
-      getTickerFinancials(ticker),
-    ]).then(([overviewData, historyData, newsData, financialsData]) => {
-      setOverview(overviewData);
-      setHistory(historyData);
-      setNews(newsData.items);
-      setFinancials(financialsData);
-    });
+    Promise.all([getTickerOverview(ticker), getTickerNews(ticker, 5), getTickerFinancials(ticker)]).then(
+      ([overviewData, newsData, financialsData]) => {
+        setOverview(overviewData);
+        setNews(newsData.items);
+        setFinancials(financialsData);
+      },
+    );
   }, [ticker]);
+
+  useEffect(() => {
+    if (!ticker) return;
+    const period = timeframe === "1M" ? "1mo" : timeframe === "3M" ? "3mo" : "6mo";
+    getTickerHistory(ticker, period, "1d").then(setHistory);
+  }, [ticker, timeframe]);
 
   const headerName = overview?.quote?.name ?? ticker;
   const summary = useMemo(() => overview?.profile?.summary?.slice(0, 260), [overview]);
@@ -190,8 +224,20 @@ export function TickerDrawer({ ticker, onClose }: Props) {
 
         {activeTab === "overview" ? (
           <>
+            <div className="tab-strip tab-strip-tight">
+              {(["1M", "3M", "6M"] as DrawerTimeframe[]).map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  className={tab === timeframe ? "tab-pill active" : "tab-pill"}
+                  onClick={() => setTimeframe(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
             <div className="drawer-chart-wrap">
-              <Sparkline bars={history?.bars ?? []} />
+              <InteractiveChart bars={history?.bars ?? []} />
             </div>
             {summary ? <p className="drawer-summary">{summary}…</p> : null}
             <div className="drawer-news">

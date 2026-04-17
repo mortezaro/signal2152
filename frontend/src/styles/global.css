@@ -251,6 +251,10 @@ a {
   margin: -4px 0 18px;
 }
 
+.tab-strip-tight {
+  margin-top: 0;
+}
+
 .tab-pill {
   border: 1px solid rgba(25, 22, 18, 0.1);
   background: rgba(255, 255, 255, 0.56);
@@ -418,6 +422,31 @@ a {
   gap: 16px;
 }
 
+.consensus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.consensus-card {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(184, 106, 55, 0.14), rgba(255, 255, 255, 0.7)),
+    rgba(255, 255, 255, 0.7);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.consensus-card em {
+  font-style: normal;
+  color: var(--accent);
+}
+
 .model-card {
   display: grid;
   gap: 16px;
@@ -465,6 +494,11 @@ a {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
+}
+
+.pulse-controls {
+  display: grid;
+  gap: 6px;
 }
 
 .pulse-card {
@@ -751,6 +785,45 @@ a {
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(25, 22, 18, 0.08);
+}
+
+.interactive-chart-wrap {
+  display: grid;
+  gap: 12px;
+  height: 100%;
+}
+
+.interactive-chart-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.interactive-chart-meta span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.interactive-chart-hitbox {
+  position: relative;
+  height: 100%;
+}
+
+.interactive-chart-sensors {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+.interactive-chart-sensor {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: crosshair;
 }
 
 .drawer-chart,

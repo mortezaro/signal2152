@@ -20,6 +20,8 @@ class QuoteSnapshot(BaseModel):
     day_low: float | None = None
     day_high: float | None = None
     sparkline: list[float] = Field(default_factory=list)
+    sparkline_5d: list[float] = Field(default_factory=list)
+    sparkline_1mo: list[float] = Field(default_factory=list)
 
 
 class PriceBar(BaseModel):

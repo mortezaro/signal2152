@@ -7,6 +7,8 @@ type Props = {
   onSelectTicker: (ticker: string) => void;
 };
 
+type Timeframe = "1D" | "5D" | "1M";
+
 function formatPrice(value?: number | null): string {
   return typeof value === "number" ? value.toFixed(2) : "—";
 }
@@ -19,6 +21,12 @@ function formatChange(value?: number | null): string {
 function formatVolume(value?: number | null): string {
   if (typeof value !== "number") return "—";
   return Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(value);
+}
+
+function sparklineFor(item: QuoteSnapshot, timeframe: Timeframe): number[] {
+  if (timeframe === "5D") return item.sparkline_5d ?? [];
+  if (timeframe === "1M") return item.sparkline_1mo ?? [];
+  return item.sparkline ?? [];
 }
 
 function Sparkline({ values }: { values: number[] }) {
@@ -50,6 +58,7 @@ export function PulseBoard({ watchlist, onSelectTicker }: Props) {
     return ["All", ...sectors];
   }, [watchlist]);
   const [activeTab, setActiveTab] = useState("All");
+  const [timeframe, setTimeframe] = useState<Timeframe>("1D");
 
   const visible = watchlist.filter((item) => activeTab === "All" || item.sector === activeTab);
 
@@ -57,20 +66,35 @@ export function PulseBoard({ watchlist, onSelectTicker }: Props) {
     <section className="panel">
       <div className="panel-header">
         <h2>Pulse board</h2>
-        <p>Compact market cards with intraday range and day shape, filtered by sector when you want a tighter read.</p>
+        <p>Compact market cards with intraday range and short-horizon path, filtered by sector and timeframe.</p>
       </div>
 
-      <div className="tab-strip">
-        {sectorTabs.map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            className={tab === activeTab ? "tab-pill active" : "tab-pill"}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
+      <div className="pulse-controls">
+        <div className="tab-strip">
+          {sectorTabs.map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              className={tab === activeTab ? "tab-pill active" : "tab-pill"}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        <div className="tab-strip tab-strip-tight">
+          {(["1D", "5D", "1M"] as Timeframe[]).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              className={tab === timeframe ? "tab-pill active" : "tab-pill"}
+              onClick={() => setTimeframe(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="pulse-grid">
@@ -100,7 +124,7 @@ export function PulseBoard({ watchlist, onSelectTicker }: Props) {
               </div>
 
               <div className="pulse-sparkline-wrap">
-                <Sparkline values={item.sparkline ?? []} />
+                <Sparkline values={sparklineFor(item, timeframe)} />
               </div>
 
               <div className="pulse-range">
@@ -108,8 +132,10 @@ export function PulseBoard({ watchlist, onSelectTicker }: Props) {
                   <span style={{ width: `${rangeProgress ?? 50}%` }} />
                 </div>
                 <div className="pulse-range-labels">
-                  <span>L {formatPrice(item.day_low)}</span>
-                  <span>H {formatPrice(item.day_high)}</span>
+                  <span>{timeframe} path</span>
+                  <span>
+                    L {formatPrice(item.day_low)} · H {formatPrice(item.day_high)}
+                  </span>
                 </div>
               </div>
 

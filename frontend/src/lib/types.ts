@@ -13,6 +13,8 @@ export type QuoteSnapshot = {
   day_low?: number | null;
   day_high?: number | null;
   sparkline: number[];
+  sparkline_5d: number[];
+  sparkline_1mo: number[];
 };
 
 export type PredictionRow = {

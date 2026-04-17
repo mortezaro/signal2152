@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { HeroPanel } from "./components/HeroPanel";
 import { MarketBar } from "./components/MarketBar";
+import { ModelConsensus } from "./components/ModelConsensus";
 import { MarketRegimeStrip } from "./components/MarketRegimeStrip";
 import { ModelRoster } from "./components/ModelRoster";
 import { NewsRail } from "./components/NewsRail";
@@ -52,6 +53,7 @@ export function App() {
           <SectorHeatmap watchlist={data.watchlist} onSelectTicker={setSelectedTicker} />
           <ModelRoster models={data.models} />
         </div>
+        <ModelConsensus models={data.models} onSelectTicker={setSelectedTicker} />
         <PulseBoard watchlist={data.watchlist} onSelectTicker={setSelectedTicker} />
         <PredictionBoard summary={data.leaderboard} onSelectTicker={setSelectedTicker} />
         <NewsRail items={data.top_news} />
