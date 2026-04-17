@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
 import { HeroPanel } from "./components/HeroPanel";
-import { EarningsSoonPanel } from "./components/EarningsSoonPanel";
 import { MarketBar } from "./components/MarketBar";
+import { MarketLensPanel } from "./components/MarketLensPanel";
 import { ModelDisagreement } from "./components/ModelDisagreement";
 import { ModelConsensus } from "./components/ModelConsensus";
 import { MarketRegimeStrip } from "./components/MarketRegimeStrip";
@@ -13,8 +13,6 @@ import { PulseBoard } from "./components/PulseBoard";
 import { RotationBoard } from "./components/RotationBoard";
 import { SectorDrawer } from "./components/SectorDrawer";
 import { SectorHeatmap } from "./components/SectorHeatmap";
-import { SectorMomentumPanel } from "./components/SectorMomentumPanel";
-import { StyleMapPanel } from "./components/StyleMapPanel";
 import { TickerDrawer } from "./components/TickerDrawer";
 import { getDashboard } from "./lib/api";
 import type { DashboardPayload } from "./lib/types";
@@ -60,12 +58,10 @@ export function App() {
           <SectorHeatmap watchlist={data.watchlist} onSelectTicker={setSelectedTicker} onSelectSector={setSelectedSector} />
           <div className="right-rail-stack">
             <ModelRoster models={data.models} />
-            <div className="dashboard-row dashboard-row-triple">
-              <EarningsSoonPanel events={data.earnings_upcoming} onSelectTicker={setSelectedTicker} />
-              <SectorMomentumPanel watchlist={data.watchlist} />
-              <StyleMapPanel watchlist={data.watchlist} />
+            <div className="dashboard-row dashboard-row-dual">
+              <RotationBoard watchlist={data.watchlist} />
+              <MarketLensPanel watchlist={data.watchlist} />
             </div>
-            <RotationBoard watchlist={data.watchlist} />
             <div className="dashboard-row dashboard-row-dual">
               <ModelConsensus models={data.models} onSelectTicker={setSelectedTicker} />
               <ModelDisagreement models={data.models} onSelectTicker={setSelectedTicker} />

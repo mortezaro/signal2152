@@ -31,6 +31,7 @@ body {
     radial-gradient(circle at right center, rgba(31, 138, 87, 0.08), transparent 18%),
     linear-gradient(180deg, #f8f2ea, #efe3d4 48%, #f6efe5 100%);
   color: var(--ink);
+  overflow-x: hidden;
 }
 
 a {
@@ -289,16 +290,11 @@ a {
 }
 
 .dashboard-row-signal {
-  grid-template-columns: minmax(340px, 0.85fr) minmax(0, 1.15fr);
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
 }
 
 .dashboard-row-dual {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.dashboard-row-triple {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
 }
 
 .right-rail-stack {
@@ -453,15 +449,12 @@ a {
   gap: 16px;
 }
 
-.earnings-grid,
-.style-map-grid {
+.compact-list {
   display: grid;
   gap: 10px;
 }
 
-.earnings-card,
-.style-card,
-.momentum-row {
+.compact-row {
   display: grid;
   gap: 6px;
   padding: 14px;
@@ -470,49 +463,36 @@ a {
   background: rgba(255, 255, 255, 0.62);
 }
 
-.earnings-card {
-  text-align: left;
-  font: inherit;
-  cursor: pointer;
-}
-
-.earnings-card span:last-child {
-  color: var(--muted);
-  font-size: 0.88rem;
-}
-
-.momentum-list {
-  display: grid;
+.compact-row-stack {
   gap: 10px;
 }
 
-.momentum-row {
-  grid-template-columns: minmax(0, 1fr) auto;
+.compact-row-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.compact-row-top {
   align-items: center;
 }
 
-.momentum-row span,
-.style-card small {
+.compact-row span,
+.compact-row small {
   color: var(--muted);
 }
 
-.momentum-triplet {
+.compact-triplet {
   display: inline-grid;
   grid-auto-flow: column;
   gap: 8px;
 }
 
-.momentum-triplet em {
+.compact-triplet em {
   font-style: normal;
   font-size: 0.82rem;
   color: var(--muted);
-}
-
-.style-card-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  align-items: baseline;
 }
 
 .style-meter {
@@ -838,7 +818,6 @@ a {
 @media (max-width: 1180px) {
   .dashboard-row-signal,
   .dashboard-row-dual,
-  .dashboard-row-triple,
   .hero-panel,
   .news-layout,
   .market-bar {
