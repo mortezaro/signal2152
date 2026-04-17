@@ -13,10 +13,11 @@ import yfinance as yf
 from sklearn.ensemble import HistGradientBoostingRegressor
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-UNIVERSE_PATH = PROJECT_ROOT / "data" / "universe" / "starter_100.txt"
-ARTIFACT_ROOT = PROJECT_ROOT / "runtime_artifacts" / "models"
-SNAPSHOT_SOURCE = PROJECT_ROOT / "seed_artifacts" / "latent_research_snapshot"
+REPO_ROOT = Path(__file__).resolve().parents[3]
+BACKEND_ROOT = Path(__file__).resolve().parents[2]
+UNIVERSE_PATH = BACKEND_ROOT / "data" / "universe" / "starter_100.txt"
+ARTIFACT_ROOT = BACKEND_ROOT / "runtime_artifacts" / "models"
+SNAPSHOT_SOURCE = REPO_ROOT / "seed_artifacts" / "latent_research_snapshot"
 
 CORE_FEATURES = [
     "return_1d",
