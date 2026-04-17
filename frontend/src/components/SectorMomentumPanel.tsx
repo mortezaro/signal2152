@@ -41,7 +41,7 @@ function buildRows(watchlist: QuoteSnapshot[]): SectorMomentumRow[] {
       const week = average(names.map((item) => pathReturn(item.sparkline_5d ?? [])));
       const month = average(names.map((item) => pathReturn(item.sparkline_1mo ?? [])));
       const positiveCount = [day, week, month].filter((value) => value > 0).length;
-      const persistence =
+      const persistence: SectorMomentumRow["persistence"] =
         positiveCount === 3 ? "Extending" : positiveCount === 2 ? "Building" : positiveCount === 1 ? "Fading" : "Mixed";
 
       return { sector, day, week, month, persistence };
