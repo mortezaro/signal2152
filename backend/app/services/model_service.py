@@ -14,7 +14,7 @@ def load_model_summary(limit: int = 10) -> ModelSummary | None:
     models = load_all_model_summaries(limit=limit)
     if not models:
         return None
-    return max(models, key=_model_sort_key)
+    return models[0]
 
 
 def load_all_model_summaries(limit: int = 10) -> list[ModelSummary]:
@@ -88,13 +88,7 @@ def _load_model_summary_from_run(run_dir: Path, limit: int) -> ModelSummary | No
     if predictions.empty:
         return None
 
-    live_predictions = predictions.loc[predictions["split"] == "live"].copy()
-    if live_predictions.empty:
-        test_predictions = predictions.loc[predictions["split"] == "test"].copy()
-        if test_predictions.empty:
-            live_predictions = predictions.copy()
-        else:
-            live_predictions = test_predictions
+    live_predictions = _select_latest_prediction_rows(predictions)
 
     live_predictions = live_predictions.sort_values("prediction", ascending=False).reset_index(drop=True)
     live_predictions["rank"] = live_predictions.index + 1
@@ -103,6 +97,7 @@ def _load_model_summary_from_run(run_dir: Path, limit: int) -> ModelSummary | No
 
     metrics = _read_json(metrics_path)
     model_data = _read_json(model_summary_path)
+    is_snapshot = bool(model_data.get("snapshot")) or "snapshot" in str(run_dir.name)
     return ModelSummary(
         model_name=model_data.get("model_name"),
         display_name=model_data.get("display_name") or _derive_run_label(predictions_path),
@@ -110,20 +105,37 @@ def _load_model_summary_from_run(run_dir: Path, limit: int) -> ModelSummary | No
         artifact_dir=str(run_dir),
         refreshed_at=model_data.get("refreshed_at"),
         live_date=model_data.get("live_date"),
+        is_snapshot=is_snapshot,
         metrics=metrics or {},
         top_predictions=_to_prediction_rows(live_predictions.head(limit)),
         bottom_predictions=_to_prediction_rows(live_predictions.tail(limit).sort_values("prediction", ascending=True)),
     )
 
 
-def _model_sort_key(summary: ModelSummary) -> tuple[float, float]:
+def _model_sort_key(summary: ModelSummary) -> tuple[int, int, float, float]:
     test_metrics = summary.metrics.get("test", {}) if summary.metrics else {}
     ic_mean = test_metrics.get("ic_mean", 0.0)
     tstat = test_metrics.get("ic_tstat", 0.0)
     try:
-        return (float(ic_mean), float(tstat))
+        return (
+            0 if summary.is_snapshot else 1,
+            1 if summary.live_date else 0,
+            float(ic_mean),
+            float(tstat),
+        )
     except (TypeError, ValueError):
-        return (0.0, 0.0)
+        return (0, 0, 0.0, 0.0)
+
+
+def _select_latest_prediction_rows(predictions: pd.DataFrame) -> pd.DataFrame:
+    frame = predictions.copy()
+    frame["date"] = pd.to_datetime(frame["date"], errors="coerce")
+    split_priority = {"live": 4, "test": 3, "valid": 2, "train": 1}
+    frame["split_priority"] = frame["split"].map(split_priority).fillna(0)
+    frame = frame.sort_values(["ticker", "split_priority", "date"], ascending=[True, False, False])
+    latest = frame.groupby("ticker", as_index=False).head(1).copy()
+    latest = latest.drop(columns=["split_priority"])
+    return latest
 
 
 def _derive_run_label(path: Path | None) -> str | None:

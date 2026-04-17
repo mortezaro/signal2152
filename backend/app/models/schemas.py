@@ -68,6 +68,7 @@ class ModelSummary(BaseModel):
     artifact_dir: str | None = None
     refreshed_at: str | None = None
     live_date: str | None = None
+    is_snapshot: bool = False
     metrics: dict[str, Any] = Field(default_factory=dict)
     top_predictions: list[PredictionRow] = Field(default_factory=list)
     bottom_predictions: list[PredictionRow] = Field(default_factory=list)

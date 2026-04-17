@@ -28,6 +28,7 @@ export type ModelSummary = {
   artifact_dir?: string | null;
   refreshed_at?: string | null;
   live_date?: string | null;
+  is_snapshot: boolean;
   metrics?: Record<string, unknown>;
   top_predictions: PredictionRow[];
   bottom_predictions: PredictionRow[];

@@ -4,15 +4,13 @@ type Props = {
   summary?: ModelSummary | null;
 };
 
-function formatMetric(value: unknown): string {
-  if (typeof value === "number") {
-    return value.toFixed(4);
-  }
-  return "n/a";
+function statusLabel(summary?: ModelSummary | null): string {
+  if (!summary) return "No model";
+  return summary.is_snapshot ? "Research Snapshot" : "Semi-live model";
 }
 
 export function HeroPanel({ summary }: Props) {
-  const testMetrics = (summary?.metrics?.test as Record<string, unknown> | undefined) ?? {};
+  const highlights = summary?.top_predictions?.slice(0, 4) ?? [];
 
   return (
     <section className="hero-panel">
@@ -26,27 +24,34 @@ export function HeroPanel({ summary }: Props) {
       </div>
 
       <div className="hero-metric-card">
-        <p className="metric-label">Active model</p>
+        <p className="metric-label">{statusLabel(summary)}</p>
         <h2>{summary?.display_name ?? summary?.run_label ?? "No model loaded"}</h2>
-        <p className="artifact-copy">{summary?.artifact_dir ?? "No artifact directory configured"}</p>
-        <p className="artifact-copy">Refreshed: {summary?.refreshed_at ?? "n/a"}</p>
-        <div className="metric-grid">
+        <div className="hero-meta-grid">
           <div>
-            <span>Test IC</span>
-            <strong>{formatMetric(testMetrics.ic_mean)}</strong>
+            <span>Refresh</span>
+            <strong>{summary?.refreshed_at ? new Date(summary.refreshed_at).toLocaleString() : "n/a"}</strong>
           </div>
           <div>
-            <span>Test t-stat</span>
-            <strong>{formatMetric(testMetrics.ic_tstat)}</strong>
+            <span>Signal date</span>
+            <strong>{summary?.live_date ?? "Latest research window"}</strong>
           </div>
           <div>
-            <span>Train rows</span>
-            <strong>{formatMetric((summary?.metrics?.train as Record<string, unknown> | undefined)?.n_rows)}</strong>
+            <span>Coverage</span>
+            <strong>{summary?.top_predictions?.length ? "Equity cross-section" : "n/a"}</strong>
           </div>
           <div>
-            <span>Validation IC</span>
-            <strong>{formatMetric((summary?.metrics?.valid as Record<string, unknown> | undefined)?.ic_mean)}</strong>
+            <span>Mode</span>
+            <strong>{summary?.is_snapshot ? "Historical research" : "Semi-live refresh"}</strong>
           </div>
+        </div>
+
+        <div className="highlight-strip">
+          {highlights.map((row) => (
+            <div key={`hero-${row.ticker}`} className="highlight-chip">
+              <span>{row.ticker}</span>
+              <strong>{row.prediction.toFixed(3)}</strong>
+            </div>
+          ))}
         </div>
       </div>
     </section>
