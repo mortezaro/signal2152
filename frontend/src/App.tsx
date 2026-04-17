@@ -9,6 +9,7 @@ import { ModelRoster } from "./components/ModelRoster";
 import { NewsRail } from "./components/NewsRail";
 import { PredictionBoard } from "./components/PredictionBoard";
 import { PulseBoard } from "./components/PulseBoard";
+import { RotationBoard } from "./components/RotationBoard";
 import { SectorDrawer } from "./components/SectorDrawer";
 import { SectorHeatmap } from "./components/SectorHeatmap";
 import { TickerDrawer } from "./components/TickerDrawer";
@@ -54,11 +55,14 @@ export function App() {
       <div className="dashboard-grid">
         <div className="dashboard-row dashboard-row-signal">
           <SectorHeatmap watchlist={data.watchlist} onSelectTicker={setSelectedTicker} onSelectSector={setSelectedSector} />
-          <ModelRoster models={data.models} />
-        </div>
-        <div className="dashboard-row dashboard-row-dual">
-          <ModelConsensus models={data.models} onSelectTicker={setSelectedTicker} />
-          <ModelDisagreement models={data.models} onSelectTicker={setSelectedTicker} />
+          <div className="right-rail-stack">
+            <ModelRoster models={data.models} />
+            <RotationBoard watchlist={data.watchlist} />
+            <div className="dashboard-row dashboard-row-dual">
+              <ModelConsensus models={data.models} onSelectTicker={setSelectedTicker} />
+              <ModelDisagreement models={data.models} onSelectTicker={setSelectedTicker} />
+            </div>
+          </div>
         </div>
         <PulseBoard watchlist={data.watchlist} onSelectTicker={setSelectedTicker} />
         <PredictionBoard summary={data.leaderboard} onSelectTicker={setSelectedTicker} />

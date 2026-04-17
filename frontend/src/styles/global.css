@@ -296,9 +296,19 @@ a {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.right-rail-stack {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
 .panel {
   border-radius: 30px;
   padding: 24px;
+}
+
+.panel-compact {
+  padding: 18px;
 }
 
 .split-panel {
@@ -506,6 +516,12 @@ a {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
+}
+
+.pulse-grid-scroll {
+  max-height: 830px;
+  overflow-y: auto;
+  padding-right: 6px;
 }
 
 .pulse-controls {
@@ -964,6 +980,27 @@ a {
   color: var(--muted);
 }
 
+.rotation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rotation-column {
+  display: grid;
+  gap: 10px;
+}
+
+.rotation-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(25, 22, 18, 0.08);
+}
+
 @media (max-width: 1080px) {
   .regime-strip,
   .market-bar,
@@ -1007,6 +1044,7 @@ a {
   .pulse-grid,
   .sector-heatmap,
   .signal-grid,
+  .rotation-grid,
   .news-list {
     grid-template-columns: 1fr;
   }

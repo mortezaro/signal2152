@@ -97,7 +97,7 @@ export function PulseBoard({ watchlist, onSelectTicker }: Props) {
         </div>
       </div>
 
-      <div className="pulse-grid">
+      <div className={activeTab === "All" ? "pulse-grid pulse-grid-scroll" : "pulse-grid"}>
         {visible.map((item) => {
           const rangeProgress =
             typeof item.price === "number" &&
