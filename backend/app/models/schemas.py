@@ -42,6 +42,14 @@ class NewsItem(BaseModel):
     thumbnail_url: str | None = None
 
 
+class EarningsEvent(BaseModel):
+    ticker: str
+    name: str | None = None
+    earnings_date: str | None = None
+    time_hint: str | None = None
+    sector: str | None = None
+
+
 class OptionContract(BaseModel):
     strike: float | None = None
     last_price: float | None = None
@@ -85,3 +93,4 @@ class DashboardPayload(BaseModel):
     leaderboard: ModelSummary | None = None
     models: list[ModelSummary] = Field(default_factory=list)
     top_news: list[NewsItem] = Field(default_factory=list)
+    earnings_upcoming: list[EarningsEvent] = Field(default_factory=list)

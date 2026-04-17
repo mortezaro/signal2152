@@ -5,7 +5,7 @@ from typing import Any
 import pandas as pd
 import yfinance as yf
 
-from app.models.schemas import FinancialRow, NewsItem, OptionContract, PriceBar, QuoteSnapshot
+from app.models.schemas import EarningsEvent, FinancialRow, NewsItem, OptionContract, PriceBar, QuoteSnapshot
 
 
 def get_quote_snapshot(ticker: str) -> QuoteSnapshot:
@@ -33,6 +33,17 @@ def get_quote_snapshot(ticker: str) -> QuoteSnapshot:
 
 def get_watchlist_snapshots(tickers: list[str]) -> list[QuoteSnapshot]:
     return [get_quote_snapshot(ticker) for ticker in tickers]
+
+
+def get_upcoming_earnings(tickers: list[str], limit: int = 8) -> list[EarningsEvent]:
+    events: list[EarningsEvent] = []
+    for ticker in tickers:
+        event = _get_earnings_event(ticker)
+        if event is not None:
+            events.append(event)
+
+    events.sort(key=lambda item: item.earnings_date or "9999-12-31")
+    return events[:limit]
 
 
 def get_price_history(ticker: str, period: str = "6mo", interval: str = "1d") -> list[PriceBar]:
@@ -179,3 +190,42 @@ def _extract_thumbnail_url(content: dict[str, Any]) -> str | None:
         if url:
             return str(url)
     return None
+
+
+def _get_earnings_event(ticker: str) -> EarningsEvent | None:
+    stock = yf.Ticker(ticker)
+    try:
+        calendar = stock.calendar
+    except Exception:
+        calendar = None
+
+    earnings_date: str | None = None
+    time_hint: str | None = None
+
+    if isinstance(calendar, pd.DataFrame) and not calendar.empty:
+        for index, row in calendar.iterrows():
+            label = str(index).lower()
+            if "earnings date" in label:
+                raw = row.iloc[0] if len(row) else None
+                if raw is not None and not pd.isna(raw):
+                    earnings_date = pd.to_datetime(raw).strftime("%Y-%m-%d")
+                    break
+    elif isinstance(calendar, dict):
+        raw = calendar.get("Earnings Date")
+        if raw is not None:
+            try:
+                earnings_date = pd.to_datetime(raw[0] if isinstance(raw, (list, tuple)) else raw).strftime("%Y-%m-%d")
+            except Exception:
+                earnings_date = None
+
+    if earnings_date is None:
+        return None
+
+    info = stock.info
+    return EarningsEvent(
+        ticker=ticker.upper(),
+        name=info.get("shortName") or info.get("longName"),
+        earnings_date=earnings_date,
+        time_hint=time_hint,
+        sector=info.get("sector"),
+    )
