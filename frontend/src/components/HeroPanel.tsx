@@ -27,8 +27,9 @@ export function HeroPanel({ summary }: Props) {
 
       <div className="hero-metric-card">
         <p className="metric-label">Active model</p>
-        <h2>{summary?.run_label ?? "No model loaded"}</h2>
+        <h2>{summary?.display_name ?? summary?.run_label ?? "No model loaded"}</h2>
         <p className="artifact-copy">{summary?.artifact_dir ?? "No artifact directory configured"}</p>
+        <p className="artifact-copy">Refreshed: {summary?.refreshed_at ?? "n/a"}</p>
         <div className="metric-grid">
           <div>
             <span>Test IC</span>

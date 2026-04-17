@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Signal2152 model refresh every 4 hours
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=4h
+Unit=market-state-refresh.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target

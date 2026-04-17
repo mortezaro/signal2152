@@ -11,48 +11,32 @@ from app.models.schemas import ModelSummary, PredictionRow
 
 
 def load_model_summary(limit: int = 10) -> ModelSummary | None:
-    artifact_paths = _resolve_artifact_paths()
-    predictions_path = artifact_paths["predictions"]
-    metrics_path = artifact_paths["metrics"]
-    model_summary_path = artifact_paths["model_summary"]
-
-    if not predictions_path:
+    models = load_all_model_summaries(limit=limit)
+    if not models:
         return None
+    return max(models, key=_model_sort_key)
 
-    predictions = pd.read_csv(predictions_path)
-    if predictions.empty:
-        return None
 
-    test_predictions = predictions.loc[predictions["split"] == "test"].copy()
-    if test_predictions.empty:
-        test_predictions = predictions.copy()
+def load_all_model_summaries(limit: int = 10) -> list[ModelSummary]:
+    root = settings.lmsa_results_root
+    if not root or not root.exists():
+        return []
 
-    test_predictions = test_predictions.sort_values("prediction", ascending=False).reset_index(drop=True)
-    test_predictions["rank"] = test_predictions.index + 1
-    max_rank = float(len(test_predictions)) if len(test_predictions) else 1.0
-    test_predictions["percentile"] = 1.0 - ((test_predictions["rank"] - 1) / max_rank)
+    models: list[ModelSummary] = []
+    for run_dir in sorted(path for path in root.iterdir() if path.is_dir()):
+        summary = _load_model_summary_from_run(run_dir=run_dir, limit=limit)
+        if summary is not None:
+            models.append(summary)
 
-    top_rows = _to_prediction_rows(test_predictions.head(limit))
-    bottom_rows = _to_prediction_rows(test_predictions.tail(limit).sort_values("prediction", ascending=True))
-
-    metrics = _read_json(metrics_path) if metrics_path else {}
-    model_summary = _read_json(model_summary_path) if model_summary_path else {}
-    return ModelSummary(
-        model_name=model_summary.get("model_name"),
-        run_label=_derive_run_label(predictions_path),
-        artifact_dir=str(predictions_path.parent),
-        metrics=metrics or {},
-        top_predictions=top_rows,
-        bottom_predictions=bottom_rows,
-    )
+    return sorted(models, key=_model_sort_key, reverse=True)
 
 
 def get_ticker_prediction(ticker: str) -> dict[str, Any] | None:
-    artifact_paths = _resolve_artifact_paths()
-    predictions_path = artifact_paths["predictions"]
-    if not predictions_path:
+    leader = load_model_summary(limit=10)
+    if leader is None or not leader.artifact_dir:
         return None
 
+    predictions_path = Path(leader.artifact_dir) / "predictions.csv"
     predictions = pd.read_csv(predictions_path)
     if predictions.empty:
         return None
@@ -93,54 +77,53 @@ def _read_json(path: Path | None) -> dict[str, Any]:
     return json.loads(path.read_text())
 
 
-def _resolve_artifact_paths() -> dict[str, Path | None]:
-    explicit_predictions = settings.lmsa_predictions_csv
-    explicit_metrics = settings.lmsa_metrics_json
-    explicit_summary = settings.lmsa_model_summary_json
+def _load_model_summary_from_run(run_dir: Path, limit: int) -> ModelSummary | None:
+    predictions_path = run_dir / "predictions.csv"
+    metrics_path = run_dir / "metrics.json"
+    model_summary_path = run_dir / "model_summary.json"
+    if not predictions_path.exists():
+        return None
 
-    if explicit_predictions and explicit_predictions.exists():
-        return {
-            "predictions": explicit_predictions,
-            "metrics": explicit_metrics if explicit_metrics and explicit_metrics.exists() else None,
-            "model_summary": explicit_summary if explicit_summary and explicit_summary.exists() else None,
-        }
+    predictions = pd.read_csv(predictions_path)
+    if predictions.empty:
+        return None
 
-    candidate_root = settings.lmsa_results_root
-    if not candidate_root or not candidate_root.exists():
-        return {"predictions": None, "metrics": None, "model_summary": None}
+    live_predictions = predictions.loc[predictions["split"] == "live"].copy()
+    if live_predictions.empty:
+        test_predictions = predictions.loc[predictions["split"] == "test"].copy()
+        if test_predictions.empty:
+            live_predictions = predictions.copy()
+        else:
+            live_predictions = test_predictions
 
-    best_run_dir = _find_best_run_dir(candidate_root)
-    if best_run_dir is None:
-        return {"predictions": None, "metrics": None, "model_summary": None}
+    live_predictions = live_predictions.sort_values("prediction", ascending=False).reset_index(drop=True)
+    live_predictions["rank"] = live_predictions.index + 1
+    max_rank = float(len(live_predictions)) if len(live_predictions) else 1.0
+    live_predictions["percentile"] = 1.0 - ((live_predictions["rank"] - 1) / max_rank)
 
-    predictions = best_run_dir / "predictions.csv"
-    metrics = best_run_dir / "metrics.json"
-    model_summary = best_run_dir / "model_summary.json"
-    return {
-        "predictions": predictions if predictions.exists() else None,
-        "metrics": metrics if metrics.exists() else None,
-        "model_summary": model_summary if model_summary.exists() else None,
-    }
+    metrics = _read_json(metrics_path)
+    model_data = _read_json(model_summary_path)
+    return ModelSummary(
+        model_name=model_data.get("model_name"),
+        display_name=model_data.get("display_name") or _derive_run_label(predictions_path),
+        run_label=model_data.get("run_name") or _derive_run_label(predictions_path),
+        artifact_dir=str(run_dir),
+        refreshed_at=model_data.get("refreshed_at"),
+        live_date=model_data.get("live_date"),
+        metrics=metrics or {},
+        top_predictions=_to_prediction_rows(live_predictions.head(limit)),
+        bottom_predictions=_to_prediction_rows(live_predictions.tail(limit).sort_values("prediction", ascending=True)),
+    )
 
 
-def _find_best_run_dir(root: Path) -> Path | None:
-    best_dir: Path | None = None
-    best_ic = float("-inf")
-
-    for metrics_path in sorted(root.glob("*/metrics.json")):
-        metrics = _read_json(metrics_path)
-        test_metrics = metrics.get("test", {})
-        ic_mean = test_metrics.get("ic_mean")
-        if not isinstance(ic_mean, (int, float)):
-            continue
-        run_dir = metrics_path.parent
-        if not (run_dir / "predictions.csv").exists():
-            continue
-        if float(ic_mean) > best_ic:
-            best_ic = float(ic_mean)
-            best_dir = run_dir
-
-    return best_dir
+def _model_sort_key(summary: ModelSummary) -> tuple[float, float]:
+    test_metrics = summary.metrics.get("test", {}) if summary.metrics else {}
+    ic_mean = test_metrics.get("ic_mean", 0.0)
+    tstat = test_metrics.get("ic_tstat", 0.0)
+    try:
+        return (float(ic_mean), float(tstat))
+    except (TypeError, ValueError):
+        return (0.0, 0.0)
 
 
 def _derive_run_label(path: Path | None) -> str | None:

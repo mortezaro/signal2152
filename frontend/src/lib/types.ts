@@ -23,8 +23,11 @@ export type PredictionRow = {
 
 export type ModelSummary = {
   model_name?: string | null;
+  display_name?: string | null;
   run_label?: string | null;
   artifact_dir?: string | null;
+  refreshed_at?: string | null;
+  live_date?: string | null;
   metrics?: Record<string, unknown>;
   top_predictions: PredictionRow[];
   bottom_predictions: PredictionRow[];
@@ -41,5 +44,6 @@ export type NewsItem = {
 export type DashboardPayload = {
   watchlist: QuoteSnapshot[];
   leaderboard?: ModelSummary | null;
+  models: ModelSummary[];
   top_news: NewsItem[];
 };

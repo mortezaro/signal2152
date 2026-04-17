@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { HeroPanel } from "./components/HeroPanel";
+import { ModelRoster } from "./components/ModelRoster";
 import { NewsRail } from "./components/NewsRail";
 import { PredictionBoard } from "./components/PredictionBoard";
 import { SignalNotes } from "./components/SignalNotes";
@@ -41,6 +42,7 @@ export function App() {
     <main className="app-shell">
       <HeroPanel summary={data.leaderboard} />
       <div className="dashboard-grid">
+        <ModelRoster models={data.models} />
         <WatchlistTable watchlist={data.watchlist} />
         <PredictionBoard summary={data.leaderboard} />
         <SignalNotes />

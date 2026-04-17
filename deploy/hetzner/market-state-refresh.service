@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh semi-live Signal2152 model artifacts
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=deploy
+Group=deploy
+WorkingDirectory=/opt/market-state-dashboard/backend
+ExecStart=/opt/market-state-dashboard/backend/.venv/bin/python -m app.scoring.refresh

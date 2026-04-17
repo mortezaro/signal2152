@@ -200,6 +200,43 @@ a {
   gap: 16px;
 }
 
+.model-roster {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.model-card {
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.model-card-top {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.model-card-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.model-card-metrics span,
+.model-card-meta {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.model-card-metrics strong {
+  display: block;
+  margin-top: 4px;
+}
+
 .notes-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

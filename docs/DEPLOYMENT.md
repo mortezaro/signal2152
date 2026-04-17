@@ -209,3 +209,36 @@ So:
 6. Keep the frontend static and simple
 
 That gives you a clean architecture and a professional portfolio deployment.
+
+## 9. Semi-live model refresh
+
+This repository now supports semi-live production artifacts for:
+
+- Ridge Live Context
+- GBDT Live Context
+- Latent Research Snapshot
+
+The scoring command is:
+
+```bash
+cd /opt/market-state-dashboard/backend
+source .venv/bin/activate
+python -m app.scoring.refresh
+```
+
+Artifacts are written to:
+
+```text
+/opt/market-state-dashboard/backend/runtime_artifacts/models
+```
+
+To enable automatic refreshes every 4 hours:
+
+```bash
+sudo cp /opt/market-state-dashboard/deploy/hetzner/market-state-refresh.service /etc/systemd/system/
+sudo cp /opt/market-state-dashboard/deploy/hetzner/market-state-refresh.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable market-state-refresh.timer
+sudo systemctl start market-state-refresh.timer
+sudo systemctl list-timers --all | grep market-state-refresh
+```

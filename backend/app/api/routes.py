@@ -4,7 +4,7 @@ from fastapi import APIRouter, Query
 
 from app.config import settings
 from app.models.schemas import DashboardPayload
-from app.services.model_service import get_ticker_prediction, load_model_summary
+from app.services.model_service import get_ticker_prediction, load_all_model_summaries, load_model_summary
 from app.services.yahoo_service import (
     get_company_profile,
     get_financial_summary,
@@ -29,9 +29,11 @@ def dashboard() -> DashboardPayload:
     watchlist = get_watchlist_snapshots(settings.default_watchlist)
     news = get_news("SPY", limit=6)
     leaderboard = load_model_summary(limit=8)
+    models = load_all_model_summaries(limit=5)
     return DashboardPayload(
         watchlist=watchlist,
         leaderboard=leaderboard,
+        models=models,
         top_news=news,
     )
 
@@ -40,6 +42,11 @@ def dashboard() -> DashboardPayload:
 def active_model() -> dict:
     summary = load_model_summary(limit=10)
     return {"model": summary}
+
+
+@router.get("/models")
+def models() -> dict:
+    return {"models": load_all_model_summaries(limit=8)}
 
 
 @router.get("/tickers/{ticker}/overview")

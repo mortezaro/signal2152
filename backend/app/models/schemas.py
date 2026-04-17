@@ -64,7 +64,10 @@ class PredictionRow(BaseModel):
 class ModelSummary(BaseModel):
     model_name: str | None = None
     run_label: str | None = None
+    display_name: str | None = None
     artifact_dir: str | None = None
+    refreshed_at: str | None = None
+    live_date: str | None = None
     metrics: dict[str, Any] = Field(default_factory=dict)
     top_predictions: list[PredictionRow] = Field(default_factory=list)
     bottom_predictions: list[PredictionRow] = Field(default_factory=list)
@@ -73,4 +76,5 @@ class ModelSummary(BaseModel):
 class DashboardPayload(BaseModel):
     watchlist: list[QuoteSnapshot]
     leaderboard: ModelSummary | None = None
+    models: list[ModelSummary] = Field(default_factory=list)
     top_news: list[NewsItem] = Field(default_factory=list)

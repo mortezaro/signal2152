@@ -46,6 +46,8 @@ market-state-dashboard/
 - ticker prediction cards
 - cross-sectional ranking table
 - confidence / percentile / decile style presentation from exported model artifacts
+- semi-live ridge and GBDT refreshes
+- research snapshot slot for deeper latent experiments
 
 ### UI direction
 
